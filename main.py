@@ -187,6 +187,7 @@ def GenerationTuyaux():
 
 
 def MouvementTuyaux():
+    global Score
     ...
 
 
