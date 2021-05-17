@@ -1,0 +1,10 @@
+Version 0.1 :
+17/05, 22h38 :
+-	Ajout du Menu de Navigation
+-	Ajout des scores et du moyen de les enregistrer dans un document data.dat
+-	Ajout du BIRD et des Tuyaux symbolisés en rectancle
+-	Ajout de la fonction Génération Tuyaux qui permet de créer des tuyaux de hauteurs aléatoires
+-	Ajout d'un Icone à la fenettre principale
+
+## Jeu encore non fonctionel, méthode du prof de boucle infinni + time.sleep() trop compliquée. ==> voir fenetre.after(...)  ##
+
