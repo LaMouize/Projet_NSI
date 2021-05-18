@@ -17,7 +17,7 @@ Hauteur = 720  # Hauteur CANVAS
 Score = 0  # Score du jeu
 meilleur_score = 0  # Variable de meilleur scores
 Pause = True  # Pause
-
+delay = 3
 
 # °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 # --------------------------------------------Ajouts/Fonctionalités-----------------------------------------------------
@@ -96,10 +96,12 @@ def Jouer():
     Démarre le Jeu
     :return:
     """
-    global Pause
-    Pause = False
-    print('test')
-    return Pause
+    global Oiseau_X, Oiseau_Y
+    Oiseau_X = Largeur / 6.5
+    Oiseau_Y = Hauteur / 2
+    MouvementBasOiseau()
+    MouvementTuyaux()
+    jeu.bind("<Button-1>", MouvementHautOiseau)
 
 
 def Changediff():
@@ -147,32 +149,27 @@ Oiseau_X = Largeur / 6.5
 Oiseau_Y = Hauteur / 2
 Imageoiseau = PhotoImage(file="bird.gif")
 BIRD = jeu.create_image(Oiseau_X, Oiseau_Y, image=Imageoiseau)
-Bird_Move_Down = 1  # Vitesse déplacement bas   ==> Plus tard modifiable dans Changediff()
+Bird_Move_Down = 0.1  # Vitesse déplacement bas   ==> Plus tard modifiable dans Changediff()
 YB = Oiseau_Y
-Bird_Move_Up = 1.3  # Vitesse de montée
+Bird_Move_Up = 0.2  # Vitesse de montée
 
 
 def MouvementBasOiseau():
-    global Pause, Bird_Move_Down, Hauteur, YB, Oiseau_X
-    # if not Pause:
-    if YB >= Hauteur - 50:
-        YB = Hauteur - 50
-        Bird_Move_Down = 1
-    if YB <= 37:
-        YB = 37
-        Bird_Move_Down = 1
-    jeu.coords(BIRD, Oiseau_X, YB)
-    YB = YB + 1 * Bird_Move_Down
-    fenetre.after(20, MouvementBasOiseau)
-    # Limite du facteur de chute
-    Bird_Move_Down += 0.40  # Semblant de Gravitée facteur 0.15   ==> Plus tard modifiable dans Changediff()
+    global Pause, Bird_Move_Down, Hauteur, YB, Oiseau_X, delay
+    # Hitbox de la fenetre
+    if YB >= Hauteur - 30:
+        YB = Hauteur - 30
+        Bird_Move_Down = 0.1
+    if YB <= 42:
+        YB = 42
+        Bird_Move_Down = 0.1
+    # Gravitée de l'oiseau
+    print(YB)
 
 
 def MouvementHautOiseau(event=None):
     global Bird_Move_Up, YB, Oiseau_X, Bird_Move_Down
-    # print('Hi')
-    # print(Bird_Move_Up, " ", YB, " ", Oiseau_X, " ", Bird_Move_Down)
-    Bird_Move_Down = -6 * Bird_Move_Up  # Gravitée nulle
+    ...
 
 
 # 2)    TUYAUX
@@ -181,14 +178,14 @@ AX1 = 1100
 AY1 = 0  # Angle rect haut gauche
 AX2 = 1000
 AY2 = 300  # Angle rect bas droit face au trou de l'oiseau
-Tuyaux_bas = jeu.create_rectangle(AX1, AY1, AX2, AY2, fill="green", outline="red")
+Tuyaux_haut = jeu.create_rectangle(AX1, AY1, AX2, AY2, fill="green", outline="red")
 
 # B- Bas Tuyau
 BX1 = 1100
 BY1 = 500  # Angle rect haut gauche face au trou de l'oiseau
 BX2 = 1000
 BY2 = Hauteur  # Angle rect bas droit
-Tuyaux_haut = jeu.create_rectangle(BX1, BY1, BX2, BY2, fill="green", outline="red")
+Tuyaux_bas = jeu.create_rectangle(BX1, BY1, BX2, BY2, fill="green", outline="red")
 
 
 def GenerationTuyaux():
@@ -201,19 +198,30 @@ def GenerationTuyaux():
     global Hauteur
 
     Score += 1
-    yalea = random.randint(210, Hauteur - 210)
+    yalea = random.randint(50, Hauteur - 170)
     AY2 = yalea
-    BY1 = yalea + 100
+    BY1 = yalea + 150
     # print(AX1, AY1, AX2, AY2, "\n", BX1, BY1, BX2, BY2, "\n", 'Voici le yalea :', yalea, "\n")  # DEBUG
 
 
 def MouvementTuyaux():
-    global Score
-    ...
+    global Score, AX1, AY1, AX2, AY2, BX1, BY1, BX2, BY2, delay
+    AX1 -= 0.4*delay
+    AX2 -= 0.4*delay
+    BX1 -= 0.4*delay
+    BX2 -= 0.4*delay
+    jeu.coords(Tuyaux_haut, AX1, AY1, AX2, AY2)
+    jeu.coords(Tuyaux_bas, BX1, BY1, BX2, BY2)
+    fenetre.after(delay, MouvementTuyaux)
+    if AX1 and BX1 <0:
+        AX1 = BX1 = 1100
+        AX2 = BX2 = 1000
+        GenerationTuyaux()
 
 
-MouvementBasOiseau()
-jeu.bind("<Button-1>", MouvementHautOiseau)
+
+
+
 
 # **********************************************************************************************************************
 # --------------------------------------------------FIN PROGRAMME-------------------------------------------------------

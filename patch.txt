@@ -14,3 +14,12 @@ Version 1.1 :
 -   Ajout de la zone de jeu, l'oiseau ne sort pas de l'écran
 
 ## Jeu encore non fonctionnel ##
+
+Version 1.2 :
+18/05, 00h00 :
+-   Ajout des Mouvements des tuyaux
+-   Ajout de l'apparition aléatoire de la hauteur des tuyaux
+-   Optimisation fluidité des tuyaux et de l'oiseau, IPS augmentés
+-   Début de la fonction Jouer, qui permet de lancer le jeu à travers une fonction dédiée.
+
+## Jeu encore non fonctionnel ==> Hitbox des tuyaux et scores à ajouter. ##
