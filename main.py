@@ -16,7 +16,7 @@ Largeur = 1280  # Largeur CANVAS
 Hauteur = 720  # Hauteur CANVAS
 Score = 0  # Score du jeu
 meilleur_score = 0  # Variable de meilleur scores
-En_Pause = True  # Pause
+Pause = True  # Pause
 
 
 # °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
@@ -96,7 +96,10 @@ def Jouer():
     Démarre le Jeu
     :return:
     """
-    ...
+    global Pause
+    Pause = False
+    print('test')
+    return Pause
 
 
 def Changediff():
@@ -114,7 +117,7 @@ fenetre = Tk()  # Stockée dans la variable "fenetre"
 fenetre.title('Oiseau Fou')  # Titre de la fenêtre
 fenetre.resizable(width=False, height=False)  # Empeche le changement de taille de la fenêtre
 fenetre.geometry(str(Largeur) + "x" + str(Hauteur))
-main_icon = PhotoImage(file="icon.ico")     # Icone de la fenetre
+main_icon = PhotoImage(file="icon.ico")  # Icone de la fenetre
 fenetre.iconphoto(False, main_icon)
 
 # Le Menu
@@ -144,14 +147,31 @@ Oiseau_X = Largeur / 6.5
 Oiseau_Y = Hauteur / 2
 Imageoiseau = PhotoImage(file="bird.gif")
 BIRD = jeu.create_image(Oiseau_X, Oiseau_Y, image=Imageoiseau)
-
+Bird_Move_Down = 1  # Vitesse déplacement bas   ==> Plus tard modifiable dans Changediff()
+YB = Oiseau_Y
+Bird_Move_Up = 1.3  # Vitesse de montée
 
 def MouvementBasOiseau():
-    ...
+    global Pause, Bird_Move_Down, Hauteur, YB, Oiseau_X
+    #if not Pause:
+    if YB >= Hauteur - 50:
+        YB = Hauteur - 50
+        Bird_Move_Down = 1
+    jeu.coords(BIRD, Oiseau_X, YB)
+    YB = YB + 1 * Bird_Move_Down
+    fenetre.after(20, MouvementBasOiseau)
+     # Limite du facteur de chute
+    Bird_Move_Down += 0.40  # Semblant de Gravitée facteur 0.15   ==> Plus tard modifiable dans Changediff()
 
 
-def MouvementHautOiseau(event):
-    ...
+
+def MouvementHautOiseau(event=None):
+    global Bird_Move_Up, YB, Oiseau_X, Bird_Move_Down
+    #print('Hi')
+    #print(Bird_Move_Up, " ", YB, " ", Oiseau_X, " ", Bird_Move_Down)
+    Bird_Move_Down = -6 * Bird_Move_Up # Gravitée nulle
+
+
 
 
 # 2)    TUYAUX
@@ -190,6 +210,9 @@ def MouvementTuyaux():
     global Score
     ...
 
+
+MouvementBasOiseau()
+jeu.bind("<Button-1>", MouvementHautOiseau)
 
 # **********************************************************************************************************************
 # --------------------------------------------------FIN PROGRAMME-------------------------------------------------------

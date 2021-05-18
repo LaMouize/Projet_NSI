@@ -8,3 +8,8 @@ Version 0.1 :
 
 ## Jeu encore non fonctionel, méthode du prof de boucle infinni + time.sleep() trop compliquée. ==> voir fenetre.after(...)  ##
 
+Version 0.1.1 :
+18/05, 11h16 :
+-   Ajout de la gravité et du saut de l'oiseau
+
+
