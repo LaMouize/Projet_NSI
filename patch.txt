@@ -13,5 +13,4 @@ Version 1.1 :
 -   Ajout de la gravité et du saut de l'oiseau
 -   Ajout de la zone de jeu, l'oiseau ne sort pas de l'écran
 
-## Jeu encore non fonctionnel
-
+## Jeu encore non fonctionnel ##
