@@ -7,9 +7,10 @@ Raphaël GEORGET
 # ------------------------------------------------Imports---------------------------------------------------------------
 from tkinter import *
 from functools import partial
+from threading import Thread
 import re
 import random
-import time
+
 
 # ---------------------------------------------Variables globales-------------------------------------------------------
 Largeur = 1280  # Largeur CANVAS
@@ -17,7 +18,7 @@ Hauteur = 720  # Hauteur CANVAS
 Score = 0  # Score du jeu
 meilleur_score = 0  # Variable de meilleur scores
 Pause = True  # Pause
-delay = 3
+
 
 # °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
 # --------------------------------------------Ajouts/Fonctionalités-----------------------------------------------------
@@ -90,18 +91,95 @@ def Records():
 # **********************************************************************************************************************
 # --------------------------------------------Programme principal-------------------------------------------------------
 # **********************************************************************************************************************
-#  programmation Flappy
+
+# --------------------------------------------Création de la Fenetre----------------------------------------------------
+
+fenetre = Tk()  # Stockée dans la variable "fenetre"
+fenetre.title('Oiseau Fou')  # Titre de la fenêtre
+fenetre.resizable(width=False, height=False)  # Empeche le changement de taille de la fenêtre
+fenetre.geometry(str(Largeur) + "x" + str(Hauteur))
+main_icon = PhotoImage(file="icon.ico")  # Icone de la fenetre
+fenetre.iconphoto(False, main_icon)
+
+# -------------------------------------------------Début du Flappy------------------------------------------------------
+jeu = Canvas(fenetre, bg="#4EC0CA", width=Largeur, height=Hauteur)
+jeu.pack()
+img = PhotoImage(file="bird.gif")
+
+
+class Oiseau:
+    """
+    Classe qui regroupe les diférents paramètres de l'oiseau
+    """
+
+    def __init__(self):
+        print("Création de l'oiseau")
+        self.posX = Largeur / 6.5
+        self.posY = Hauteur / 2
+        self.image = jeu.create_image(self.posX, self.posY, image=img)
+        self.velocity = 1
+        self.framerate = 10  # Fréquence de raffraichissement 10ms
+        self.saut = False
+        #  Exécution
+        self.Gravite()
+
+    def Hitbox(self):
+        """
+
+        """
+        pass
+
+    def Gravite(self):
+        """
+
+        """
+        pass
+
+    def Saut(self):
+        """
+
+        """
+        pass
+
+
+class Tuyaux:
+    """
+    Classe qui regroupe les diférents paramètres des tuyaux
+    """
+
+    def __init__(self):
+        self.AX1 = 1100
+        self.AY1 = 0
+        self.AX2 = 1000
+        self.AY2 = 300
+        self.BX1 = 1100
+        self.BY1 = 500
+        self.BX2 = 1000
+        self.BY2 = Hauteur
+        self.Tuyau_haut = jeu.create_rectangle(self.AX1, self.AY1, self.AX2, self.AY2, fill="green", outline="red")
+        self.Tuyau_bas = jeu.create_rectangle(self.BX1, self.BY1, self.BX2, self.BY2, fill="green", outline="red")
+        #  Execution
+        self.GenerationTuyaux()
+        self.MouvementTuyaux()
+
+    def GenerationTuyaux(self):
+        aleatoire = random.randint(50, Hauteur - 170)
+        self.AY2 = aleatoire
+        self.BY1 = aleatoire - 170
+
+    def MouvementTuyaux(self):
+        self.AX1 -= 1
+        self.AX2 -= 1
+        jeu.coords(self.Tuyau_haut, self.AX1, self.AY1, self.AX2, self.AY2)
+        fenetre.after(5, self.MouvementTuyaux)
+#  ------------------------------------Programmation Externe du Flappy Bird---------------------------------------------
 def Jouer():
     """
     Démarre le Jeu
     :return:
     """
-    global Oiseau_X, Oiseau_Y
-    Oiseau_X = Largeur / 6.5
-    Oiseau_Y = Hauteur / 2
-    MouvementBasOiseau()
-    MouvementTuyaux()
-    jeu.bind("<Button-1>", MouvementHautOiseau)
+    Oiseau()
+    Tuyaux()
 
 
 def Changediff():
@@ -113,16 +191,7 @@ def Changediff():
     ...
 
 
-# --------------------------------------------Création de la Fenetre----------------------------------------------------
-
-fenetre = Tk()  # Stockée dans la variable "fenetre"
-fenetre.title('Oiseau Fou')  # Titre de la fenêtre
-fenetre.resizable(width=False, height=False)  # Empeche le changement de taille de la fenêtre
-fenetre.geometry(str(Largeur) + "x" + str(Hauteur))
-main_icon = PhotoImage(file="icon.ico")  # Icone de la fenetre
-fenetre.iconphoto(False, main_icon)
-
-# Le Menu
+# ---------------------------------------------Création du Menu---------------------------------------------------------
 menu_bar = Menu(fenetre)
 
 file_menu = Menu(menu_bar, tearoff=0)
@@ -140,88 +209,6 @@ score_menu.add_command(label="Enregistrer", command=FenFormulaire)
 menu_bar.add_cascade(label="Scores", menu=score_menu)
 
 fenetre.config(menu=menu_bar)
-
-# -------------------------------------------------Début du Flappy------------------------------------------------------
-jeu = Canvas(fenetre, bg="#4EC0CA", width=Largeur, height=Hauteur)
-jeu.pack()
-# 1)    OISEAU
-Oiseau_X = Largeur / 6.5
-Oiseau_Y = Hauteur / 2
-Imageoiseau = PhotoImage(file="bird.gif")
-BIRD = jeu.create_image(Oiseau_X, Oiseau_Y, image=Imageoiseau)
-Bird_Move_Down = 0.1  # Vitesse déplacement bas   ==> Plus tard modifiable dans Changediff()
-YB = Oiseau_Y
-Bird_Move_Up = 0.2  # Vitesse de montée
-
-
-def MouvementBasOiseau():
-    global Pause, Bird_Move_Down, Hauteur, YB, Oiseau_X, delay
-    # Hitbox de la fenetre
-    if YB >= Hauteur - 30:
-        YB = Hauteur - 30
-        Bird_Move_Down = 0.1
-    if YB <= 42:
-        YB = 42
-        Bird_Move_Down = 0.1
-    # Gravitée de l'oiseau
-    print(YB)
-
-
-def MouvementHautOiseau(event=None):
-    global Bird_Move_Up, YB, Oiseau_X, Bird_Move_Down
-    ...
-
-
-# 2)    TUYAUX
-# A- Haut Tuyau
-AX1 = 1100
-AY1 = 0  # Angle rect haut gauche
-AX2 = 1000
-AY2 = 300  # Angle rect bas droit face au trou de l'oiseau
-Tuyaux_haut = jeu.create_rectangle(AX1, AY1, AX2, AY2, fill="green", outline="red")
-
-# B- Bas Tuyau
-BX1 = 1100
-BY1 = 500  # Angle rect haut gauche face au trou de l'oiseau
-BX2 = 1000
-BY2 = Hauteur  # Angle rect bas droit
-Tuyaux_bas = jeu.create_rectangle(BX1, BY1, BX2, BY2, fill="green", outline="red")
-
-
-def GenerationTuyaux():
-    """
-    Génère aléatoirement la hauteur des tuyaux avec espace de 200 entre Tuyaux_haut et Tuyaux_bas
-    :return: Aucun Return
-    """
-    global AX1, AY1, AX2, AY2, BX1, BY1, BX2, BY2
-    global Score
-    global Hauteur
-
-    Score += 1
-    yalea = random.randint(50, Hauteur - 170)
-    AY2 = yalea
-    BY1 = yalea + 150
-    # print(AX1, AY1, AX2, AY2, "\n", BX1, BY1, BX2, BY2, "\n", 'Voici le yalea :', yalea, "\n")  # DEBUG
-
-
-def MouvementTuyaux():
-    global Score, AX1, AY1, AX2, AY2, BX1, BY1, BX2, BY2, delay
-    AX1 -= 0.4*delay
-    AX2 -= 0.4*delay
-    BX1 -= 0.4*delay
-    BX2 -= 0.4*delay
-    jeu.coords(Tuyaux_haut, AX1, AY1, AX2, AY2)
-    jeu.coords(Tuyaux_bas, BX1, BY1, BX2, BY2)
-    fenetre.after(delay, MouvementTuyaux)
-    if AX1 and BX1 <0:
-        AX1 = BX1 = 1100
-        AX2 = BX2 = 1000
-        GenerationTuyaux()
-
-
-
-
-
 
 # **********************************************************************************************************************
 # --------------------------------------------------FIN PROGRAMME-------------------------------------------------------

@@ -16,10 +16,19 @@ Version 1.1 :
 ## Jeu encore non fonctionnel ##
 
 Version 1.2 :
-18/05, 00h00 :
+18/05, 17h28 :
 -   Ajout des Mouvements des tuyaux
 -   Ajout de l'apparition aléatoire de la hauteur des tuyaux
 -   Optimisation fluidité des tuyaux et de l'oiseau, IPS augmentés
 -   Début de la fonction Jouer, qui permet de lancer le jeu à travers une fonction dédiée.
 
 ## Jeu encore non fonctionnel ==> Hitbox des tuyaux et scores à ajouter. ##
+
+Version 2 :
+18/05, 22h55 :
+-   Restructuration du programme suite à une perte de la version 1.2, création des Classes Oiseau et Tuyaux.
+-   Gain de place en ligne de code
+-   Gain de place en mémoire
+==> Bug sur la fonction de déplacement des objets, lorsque la souris bouge le jeu "s'accélère" a règler <==
+
+## Jeu non fonctionnel, retour au même avancement que la version 1 ##
