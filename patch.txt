@@ -26,9 +26,17 @@ Version 1.2 :
 
 Version 2 :
 18/05, 22h55 :
--   Restructuration du programme suite à une perte de la version 1.2, création des Classes Oiseau et Tuyaux.
+-   Restructuration du programme suite à une perte de la version 1.2, création des Classes Oiseau() et Tuyaux().
 -   Gain de place en ligne de code
 -   Gain de place en mémoire
 ==> Bug sur la fonction de déplacement des objets, lorsque la souris bouge le jeu "s'accélère" a règler <==
 
 ## Jeu non fonctionnel, retour au même avancement que la version 1 ##
+
+Version 2.1 :
+19/05, 13h16 :
+-   Oiseau fonctionnel
+-   Tuyaux Fonctionnels
+FIX : le jeu se relancait quand le bouton Lancer le jeu était éxécutée plusieurs fois
+
+## Jeu non fonctionnel, Manque hitboxes Tuyaux et Scores##

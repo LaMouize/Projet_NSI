@@ -11,13 +11,11 @@ from threading import Thread
 import re
 import random
 
-
 # ---------------------------------------------Variables globales-------------------------------------------------------
 Largeur = 1280  # Largeur CANVAS
 Hauteur = 720  # Hauteur CANVAS
 Score = 0  # Score du jeu
 meilleur_score = 0  # Variable de meilleur scores
-Pause = True  # Pause
 
 
 # °°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°°
@@ -104,48 +102,71 @@ fenetre.iconphoto(False, main_icon)
 # -------------------------------------------------Début du Flappy------------------------------------------------------
 jeu = Canvas(fenetre, bg="#4EC0CA", width=Largeur, height=Hauteur)
 jeu.pack()
-img = PhotoImage(file="bird.gif")
 
 
 class Oiseau:
     """
     Classe qui regroupe les diférents paramètres de l'oiseau
     """
+    Pause = True
+    img = PhotoImage(file="bird.gif")
 
     def __init__(self):
         print("Création de l'oiseau")
         self.posX = Largeur / 6.5
         self.posY = Hauteur / 2
-        self.image = jeu.create_image(self.posX, self.posY, image=img)
+        self.image = jeu.create_image(self.posX, self.posY, image=Oiseau.img)
         self.velocity = 1
+        self.multiplicateur = 1.0  # Simulation d'une gravitée
         self.framerate = 10  # Fréquence de raffraichissement 10ms
         self.saut = False
-        #  Exécution
-        self.Gravite()
+        self.Perdu = False
+
+    def lancer(self):
+        Oiseau.Pause = False
+
+    lancement = classmethod(lancer)
 
     def Hitbox(self):
         """
 
         """
-        pass
+        if self.posY >= Hauteur - 30:
+            print('Tombé !')
+            self.multiplicateur = 1
+            self.posY = Hauteur - 30
+            self.Perdu = True
+        if self.posY <= 42:
+            self.posY = 41
+
 
     def Gravite(self):
         """
-
+        Moteur de l'oiseau, cette fonction "infinnie" regroupe la gravitée et fait appel aux fonction Hitboxs et Saut
         """
-        pass
+        if not self.Perdu:
+            self.Hitbox()
+            jeu.bind("<Button-1>", self.Saut)
+            if self.multiplicateur < 6:
+                self.multiplicateur += 0.05
+            self.posY += self.velocity * self.multiplicateur
+            jeu.coords(self.image, self.posX, self.posY)
+            fenetre.after(self.framerate, self.Gravite)
+        else:
+            print('Perdu !')
 
-    def Saut(self):
+    def Saut(self, event=None):
         """
-
+        Fait Sauter L'oiseau
         """
-        pass
+        self.multiplicateur = -3.2
 
 
 class Tuyaux:
     """
     Classe qui regroupe les diférents paramètres des tuyaux
     """
+    Pause = True
 
     def __init__(self):
         self.AX1 = 1100
@@ -158,28 +179,41 @@ class Tuyaux:
         self.BY2 = Hauteur
         self.Tuyau_haut = jeu.create_rectangle(self.AX1, self.AY1, self.AX2, self.AY2, fill="green", outline="red")
         self.Tuyau_bas = jeu.create_rectangle(self.BX1, self.BY1, self.BX2, self.BY2, fill="green", outline="red")
-        #  Execution
-        self.GenerationTuyaux()
-        self.MouvementTuyaux()
+
+    def lancer(cls):
+        Tuyaux.Pause = False
 
     def GenerationTuyaux(self):
         aleatoire = random.randint(50, Hauteur - 170)
         self.AY2 = aleatoire
-        self.BY1 = aleatoire - 170
+        self.BY1 = aleatoire + 170
 
     def MouvementTuyaux(self):
         self.AX1 -= 1
         self.AX2 -= 1
         jeu.coords(self.Tuyau_haut, self.AX1, self.AY1, self.AX2, self.AY2)
+        self.BX1 -= 1
+        self.BX2 -= 1
+        jeu.coords(self.Tuyau_bas, self.BX1, self.BY1, self.BX2, self.BY2)
         fenetre.after(5, self.MouvementTuyaux)
+
+
 #  ------------------------------------Programmation Externe du Flappy Bird---------------------------------------------
 def Jouer():
     """
     Démarre le Jeu
     :return:
     """
-    Oiseau()
-    Tuyaux()
+    if not Oiseau.Pause and not Tuyaux.Pause:
+        print('Jeu déja lancé !')
+    else:
+        lancement_Oiseau = Oiseau()
+        lancement_Tuyaux = Tuyaux()
+        lancement_Oiseau.lancer()
+        lancement_Tuyaux.lancer()
+        lancement_Oiseau.Gravite()
+        lancement_Oiseau.Hitbox()
+        lancement_Tuyaux.MouvementTuyaux()
 
 
 def Changediff():
@@ -190,6 +224,11 @@ def Changediff():
     """
     ...
 
+def Relancer():
+    """
+    Relance le jeu
+    """
+    pass
 
 # ---------------------------------------------Création du Menu---------------------------------------------------------
 menu_bar = Menu(fenetre)
@@ -201,6 +240,7 @@ menu_bar.add_cascade(label="Fichier", menu=file_menu)
 game_menu = Menu(menu_bar, tearoff=0)
 game_menu.add_command(label="Lancer_Partie", command=Jouer)
 game_menu.add_command(label="Changer_difficultée", command=Changediff)
+game_menu.add_command(label="Relancer_Partie", command=Relancer)
 menu_bar.add_cascade(label="Jeu", menu=game_menu)
 
 score_menu = Menu(menu_bar, tearoff=0)
