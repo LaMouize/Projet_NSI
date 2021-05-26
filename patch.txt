@@ -40,3 +40,9 @@ Version 2.1 :
 FIX : le jeu se relancait quand le bouton Lancer le jeu était éxécutée plusieurs fois
 
 ## Jeu non fonctionnel, Manque hitboxes Tuyaux et Scores##
+
+Version 3.0 :
+26/05, 23h36:
+Découverte des classes Maitres et des classes Esclaves, modifications internes importantes.
+-   Jeu Fonctionnel
+
